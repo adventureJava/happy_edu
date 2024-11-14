@@ -69,7 +69,12 @@ export const NoticeModal: FC<INoticeModalProps> = ({ onSuccess, noticeSeq, setNo
         };
         const update = await postNoticeApi<IPostResponse>(Notice.getUpdate,param);
         if(update){
-            update.result === 'success' && onSuccess();
+            if(update.result === 'success'){                
+                alert('수정성공');
+            }else if(update.result === 'fail'){
+                alert('수정실패');
+            }
+            onSuccess();
         }
         // axios.post('/board/noticeUpdateBody.do',param).then((res: AxiosResponse<IPostResponse>) => {
         //     res.data.result === 'success' && onSuccess();
