@@ -118,9 +118,7 @@ export const NoticeMain = () => {
                 <Portal>
                     <NoticeModal onSuccess={onPostSuccess} noticeSeq={index} setNoticeSeq={setIndex}/>
                 </Portal>
-            )}
-            
-            
+            )}                    
         </>
     );
 };
