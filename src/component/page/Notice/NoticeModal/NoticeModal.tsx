@@ -4,10 +4,11 @@ import { modalState } from '../../../../stores/modalState';
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { loginInfoState } from '../../../../stores/userInfo';
 import { ILoginInfo } from '../../../../models/interface/store/userInfo';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { IDetailResponse, INoticeDetail, IPostResponse } from '../../../../models/interface/INotice';
 import { postNoticeApi } from '../../../../api/postNoticeApi';
 import { Notice } from '../../../../api/api';
+import { blob } from 'stream/consumers';
 
 interface INoticeModalProps {
     onSuccess: () => void;
@@ -163,7 +164,29 @@ export const NoticeModal: FC<INoticeModalProps> = ({ onSuccess, noticeSeq, setNo
             }
             setFileData(fileInfo[0]);
         }
-        
+    }
+
+    const downloadFile = async () => {
+        const param = new URLSearchParams();
+        param.append('noticeSeq',noticeSeq.toString());
+
+        const postAction: AxiosRequestConfig = {
+            url: '/board/noticeDownload.do',
+            method: 'POST',
+            data: param,
+            responseType: 'blob',
+        };
+
+        await axios(postAction).then((res) => {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', noticeDetail?.fileName as string);
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+        })
     }
 
     return (
@@ -179,7 +202,7 @@ export const NoticeModal: FC<INoticeModalProps> = ({ onSuccess, noticeSeq, setNo
                 <label className="img-label" htmlFor="fileInput">
                     파일 첨부하기
                 </label>
-                <div>
+                <div onClick={downloadFile}>
                     {imageUrl ? <div>
                         <label>미리보기</label>
                         <img src={imageUrl} />
